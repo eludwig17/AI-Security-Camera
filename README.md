@@ -20,4 +20,4 @@
 |  |  |  |  |  |
 
 ## License
-This web application is licensed under [MIT.](https://github.com/eludwig17/Seating-Chart-App/blob/main/LICENSE)
+This web application is licensed under [MIT.](https://github.com/eludwig17/AI-Security-Camera/blob/main/LICENSE)
