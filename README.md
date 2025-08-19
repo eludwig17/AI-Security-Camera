@@ -1,7 +1,4 @@
 # Artifical Intelligence Security Camera
-##### School: Concordia University Irvine
-##### Developer: Elijah Ludwig
-
 
 ###### _This is my Senior Project that utilizes a Jetson Orin device that will be accessible via a weblink to see the camera's perspective in real-time, with the goal of the using the AI computing power to detect objects on screen, to label those objects and track their movement._
 
