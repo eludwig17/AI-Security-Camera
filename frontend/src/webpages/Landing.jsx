@@ -7,17 +7,17 @@ import '../App.css'
 
 const sampleSlides = [
   {
-    url: 'https://images.unsplash.com/photo-1529429617124-aee1f1650a5c?auto=format&fit=crop&w=1600&q=80',
+    // url: 'https://images.unsplash.com/photo-1529429617124-aee1f1650a5c?auto=format&fit=crop&w=1600&q=80',
     title: 'Coastal morning light',
     caption: 'Swap these URLs with your own images anytime.',
   },
   {
-    url: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=1600&q=80',
+    // url: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=1600&q=80',
     title: 'City evenings',
     caption: 'Modern, responsive carousel built with plain React.',
   },
   {
-    url: 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=1600&q=80',
+    // url: 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=1600&q=80',
     title: 'Creative workspaces',
     caption: 'Replace this list with any images you want to showcase.',
   },

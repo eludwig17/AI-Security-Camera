@@ -24,14 +24,15 @@ function Home() {
   }
 
   return (
-    <div className="page">
+    <div className="page home-page">
+
+
       <div className="page__header">
         <p className="pill">Home</p>
         <h1>Welcome back{user?.name ? `, ${user.name}` : ''}!</h1>
         <p className="lede">You successfully signed in with Google. Manage your session below.</p>
-      </div>
 
-      <div className="panel">
+        <div className="panel panel--top-right">
         {user ? (
           <div className="user-card">
             <div className="user-card__info">
@@ -46,14 +47,34 @@ function Home() {
               <button type="button" className="google" onClick={handleLogout}>
                 Logout
               </button>
-              <button type="button" className="google" onClick={() => navigate('/')}>
-                Back to Landing
-              </button>
             </div>
           </div>
         ) : (
           <p className="lede">No active session. Redirecting...</p>
         )}
+        </div>
+      </div>
+
+
+
+      <div className="panel">
+        <div className="panel__head">
+          <div>
+            <p className="eyebrow">Navigation</p>
+            <h2>Go to other pages</h2>
+          </div>
+        </div>
+        <div className="user-card__actions">
+          <button type="button" className="google" onClick={() => navigate('/live')}>
+            View Live Feed
+          </button>
+          <button type="button" className="google" onClick={() => navigate('/archives')}>
+            View Archives
+          </button>
+          <button type="button" className="google" onClick={() => navigate('/')}>
+            Landing Page
+          </button>
+        </div>
       </div>
     </div>
   )
