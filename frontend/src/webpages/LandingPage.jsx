@@ -1,1 +1,0 @@
-﻿   // This is the landing page for the web application of this project
