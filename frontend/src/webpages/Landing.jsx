@@ -7,17 +7,17 @@ import '../App.css'
 
 const sampleSlides = [
   {
-    // url: 'https://images.unsplash.com/photo-1529429617124-aee1f1650a5c?auto=format&fit=crop&w=1600&q=80',
-    title: 'Page1Test',
+    url: '/example1.jpg',
+    title: 'Object Detection',
     caption: 'Replace caption later',
   },
   {
-    // url: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=1600&q=80',
-    title: 'Page2Test',
+    url: '/example2.png',
+    title: 'Object Recognition',
     caption: 'Replace caption later',
   },
   {
-    // url: 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=1600&q=80',
+    url: '/example2.png',
     title: 'Page3Test',
     caption: 'Replace caption later',
   },
