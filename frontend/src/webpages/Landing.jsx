@@ -135,9 +135,6 @@ function Landing() {
         <aside className="panel auth">
           <p className="eyebrow">Account</p>
           <h2>Login with Google</h2>
-          <p className="lede">
-            Finish setting up OAuth2.0
-          </p>
           <div className="auth__form">
             {!user ? (
               <>
