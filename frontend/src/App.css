@@ -252,6 +252,34 @@
   height: 22px;
 }
 
+/* Microsoft / auth provider button - same look as .google */
+.auth-provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: white;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.auth-provider:hover {
+  transform: translateY(-1px);
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+}
+
+.auth-provider svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
 .microcopy {
   margin: 0;
   color: #64748b;

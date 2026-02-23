@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { googleLogout } from '@react-oauth/google'
+import { useMsal } from '@azure/msal-react'
 import '../App.css'
 
 function Home() {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
+  const { instance } = useMsal()
 
   useEffect(() => {
     const stored = localStorage.getItem('googleUser')
@@ -17,7 +19,11 @@ function Home() {
   }, [navigate])
 
   const handleLogout = () => {
-    googleLogout()
+    if (user?.provider === 'microsoft') {
+      instance.logoutRedirect({ postLogoutRedirectUri: '/' }).catch(() => {})
+    } else {
+      googleLogout()
+    }
     localStorage.removeItem('googleUser')
     setUser(null)
     navigate('/')
@@ -30,7 +36,7 @@ function Home() {
       <div className="page__header">
         <p className="pill">Home</p>
         <h1>Welcome back{user?.name ? `, ${user.name}` : ''}!</h1>
-        <p className="lede">You successfully signed in with Google. Manage your session below.</p>
+        <p className="lede">You successfully signed in. Manage your session below.</p>
 
         <div className="panel panel--top-right">
         {user ? (
