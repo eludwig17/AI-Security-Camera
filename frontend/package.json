@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/msal-browser": "^4.29.0",
+    "@azure/msal-react": "^3.0.27",
     "@react-oauth/google": "^0.13.4",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
