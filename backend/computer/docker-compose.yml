@@ -1,0 +1,30 @@
+services:
+  camera:
+    build: .
+    container_name: ai-camera-edge
+    restart: unless-stopped
+    runtime: nvidia
+    network_mode: host
+    privileged: true
+    environment:
+      GCE_VM_IP: ${GCE_VM_IP:-100.85.143.65}
+      GCE_FRAME_PORT: ${GCE_FRAME_PORT:-9000}
+      GCE_API_URL: ${GCE_API_URL:-https://open-cv-frontend.taila8654.ts.net:8000/api/events}
+      CAMERA_TYPE: ${CAMERA_TYPE:-csi}
+      MODEL_PATH: ${MODEL_PATH:-yolo26n.engine}
+      MODEL_PT_PATH: ${MODEL_PT_PATH:-yolo26n.pt}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    devices:
+      - /dev/video0:/dev/video0
+    volumes:
+      - clips_data:/app/clips
+      - ./models:/app/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+volumes:
+  clips_data:
