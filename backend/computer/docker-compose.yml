@@ -14,11 +14,23 @@ services:
       MODEL_PATH: ${MODEL_PATH:-yolo26n.engine}
       MODEL_PT_PATH: ${MODEL_PT_PATH:-yolo26n.pt}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      GST_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/gstreamer-1.0
+      GST_DEBUG: "2"
+      LD_LIBRARY_PATH: /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/nvidia:/usr/local/cuda-12.6/targets/aarch64-linux/lib:/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}
     devices:
       - /dev/video0:/dev/video0
     volumes:
       - clips_data:/app/clips
       - ./models:/app/models:ro
+      - /tmp/argus_socket:/tmp/argus_socket
+      - /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra:ro
+      - /usr/lib/aarch64-linux-gnu/nvidia:/usr/lib/aarch64-linux-gnu/nvidia:ro
+      - /usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0:ro
+      - /usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl:ro
+      - /usr/share/nvidia:/usr/share/nvidia:ro
+      - /usr/local/cuda-12.6/targets/aarch64-linux/lib:/usr/local/cuda-12.6/targets/aarch64-linux/lib:ro
     deploy:
       resources:
         reservations:
@@ -26,5 +38,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
 volumes:
   clips_data:
