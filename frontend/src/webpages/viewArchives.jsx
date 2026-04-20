@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { googleLogout } from '@react-oauth/google'
 import '../App.css'
@@ -10,6 +10,8 @@ function ViewArchives() {
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [showVideo, setShowVideo] = useState(false)
+  const [deletingEventId, setDeletingEventId] = useState(null)
+  const [deleteError, setDeleteError] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -21,22 +23,53 @@ function ViewArchives() {
     }
   }, [navigate])
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/events?limit=100')
-        const data = await res.json()
-        setEvents(data.events || [])
-      } catch (err) {
-        console.error('Failed to fetch events:', err)
-      } finally {
-        setLoading(false)
-      }
+  const fetchEvents = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true)
+    try {
+      const res = await fetch('/api/events?limit=100')
+      const data = await res.json()
+      const fetchedEvents = data.events || []
+      setEvents(fetchedEvents)
+      setSelectedEvent(prev => (prev ? fetchedEvents.find(e => e.id === prev.id) || null : null))
+    } catch (err) {
+      console.error('Failed to fetch events:', err)
+    } finally {
+      if (showLoading) setLoading(false)
     }
-    fetchEvents()
-    const interval = setInterval(fetchEvents, 10000)
-    return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    fetchEvents(true)
+    const interval = setInterval(() => fetchEvents(false), 10000)
+    return () => clearInterval(interval)
+  }, [fetchEvents])
+
+  const handleDeleteEvent = async (eventToDelete) => {
+    const shouldDelete = window.confirm(
+      `Delete this ${eventToDelete.class_name} event and its saved snapshot/clip?`
+    )
+    if (!shouldDelete) return
+
+    setDeleteError('')
+    setDeletingEventId(eventToDelete.id)
+
+    try {
+      const res = await fetch(`/api/events/${eventToDelete.id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}))
+        throw new Error(errBody.detail || 'Failed to delete event.')
+      }
+
+      setEvents(prev => prev.filter(e => e.id !== eventToDelete.id))
+      setSelectedEvent(prev => (prev?.id === eventToDelete.id ? null : prev))
+      setShowVideo(false)
+    } catch (err) {
+      console.error('Failed to delete event:', err)
+      setDeleteError(err.message || 'Failed to delete event.')
+    } finally {
+      setDeletingEventId(null)
+    }
+  }
 
   const handleLogout = () => {
     googleLogout()
@@ -88,6 +121,11 @@ function ViewArchives() {
               <h2>Recent Detections</h2>
             </div>
           </div>
+          {deleteError && (
+            <div style={{ padding: '0 12px 8px', color: '#f87171', fontSize: '12px' }}>
+              {deleteError}
+            </div>
+          )}
 
           {loading ? (
             <div className="archive-placeholder">
@@ -187,6 +225,19 @@ function ViewArchives() {
                   }}>
                     {(evt.confidence * 100).toFixed(0)}%
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteEvent(evt)
+                    }}
+                    disabled={deletingEventId === evt.id}
+                    className="google"
+                    style={{ padding: '6px 10px', fontSize: '12px' }}
+                  >
+                    {deletingEventId === evt.id ? 'Deleting' : 'Delete'}
+                  </button>
                 </div>
               ))}
             </div>
@@ -284,6 +335,13 @@ function ViewArchives() {
                   {showVideo ? 'Show Snapshot' : 'Play Video'}
                 </button>
               )}
+              <button
+                onClick={() => handleDeleteEvent(selectedEvent)}
+                className="google"
+                disabled={deletingEventId === selectedEvent.id}
+              >
+                {deletingEventId === selectedEvent.id ? 'Deleting' : 'Delete Event'}
+              </button>
               <button
                 onClick={() => { setSelectedEvent(null); setShowVideo(false); }}
                 className="google"

@@ -191,8 +191,8 @@ async def insertEvent(classId, className, confidence, bbox, snapshotB64=None, cl
 
     bboxStr = ",".join(str(c) for c in bbox) if bbox else ""
     row = await _pool.fetchrow(
-        "INSERT INTO events (class_id, class_name, confidence, bbox, snapshot_path, clip_path, face_match) "
-        "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+        "INSERT INTO events (class_id, class_name, confidence, bbox, snapshot_path, clip_path, face_match, detected_at) "
+        "VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING id",
         classId, className, confidence, bboxStr, snapshotPath, clipPath, faceMatch,
     )
     return row["id"]
@@ -345,6 +345,29 @@ async def createEvent(event: EventCreate):
 
     return {"id": eid, "status": "ok", "face_match": faceMatch}
 
+@app.delete("/api/events/{event_id}")
+async def delete_event(event_id: int):
+    async with _pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT * FROM events WHERE id = $1", event_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Event not found.")
+
+        if row["snapshot_path"] and os.path.exists(row["snapshot_path"]):
+            try:
+                os.remove(row["snapshot_path"])
+            except OSError as e:
+                print(f"Warning: could not delete snapshot {row['snapshot_path']}: {e}")
+
+        if row["clip_path"] and os.path.exists(row["clip_path"]):
+            try:
+                os.remove(row["clip_path"])
+            except OSError as e:
+                print(f"Warning: could not delete clip {row['clip_path']}: {e}")
+
+        await conn.execute("DELETE FROM events WHERE id = $1", event_id)
+
+    return {"deleted": event_id}
+
 @app.get("/api/events")
 async def listEvents(limit: int = 50, offset: int = 0):
     return {"events": await getEvents(limit, offset)}
@@ -408,7 +431,6 @@ async def identifyFaceEndpoint(payload: dict):
         raise HTTPException(status_code=400, detail="embedding required")
     name, distance = await identifyFace(embedding)
     return {"match": name, "distance": round(distance, 4), "threshold": config.faceRecognitionThreshold}
-
 
 frontend = Path(config.frontendBuildDir).resolve()
 if frontend.exists() and (frontend / "assets").exists():

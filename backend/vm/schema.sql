@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS events (
     bbox_x2         INTEGER NOT NULL,
     bbox_y2         INTEGER NOT NULL,
     snapshot_path   VARCHAR(512),
-    detected_at     TIMESTAMPTZ NOT NULL,
+    detected_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -32,3 +32,4 @@ CREATE TABLE IF NOT EXISTS known_faces (
 CREATE INDEX IF NOT EXISTS idx_known_faces_name ON known_faces (name);
 
 ALTER TABLE events ADD COLUMN IF NOT EXISTS face_match TEXT DEFAULT NULL;
+ALTER TABLE events ALTER COLUMN detected_at SET DEFAULT NOW();
