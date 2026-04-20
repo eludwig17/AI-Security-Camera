@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-camera-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: camera_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeForProduction}
+      POSTGRES_DB: ai_camera
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U camera_user -d ai_camera"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    container_name: ai-camera-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ai_camera
+      DB_USER: camera_user
+      DB_PASSWORD: ${DB_PASSWORD:-changeme_in_production}
+      SERVER_HOST: "0.0.0.0"
+      SERVER_PORT: "8000"
+      FRAME_RECEIVER_HOST: "0.0.0.0"
+      FRAME_RECEIVER_PORT: "9000"
+      FRONTEND_BUILD_DIR: frontend/dist
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    volumes:
+      - snapshots_data:/app/snapshots
+      - ./server.crt:/app/server.crt:ro
+      - ./server.key:/app/server.key:ro
+    command: ["python3", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-certfile", "/app/server.crt", "--ssl-keyfile", "/app/server.key"]
+volumes:
+  postgres_data:
+  snapshots_data:
