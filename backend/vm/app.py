@@ -2,6 +2,7 @@ import os, json, time, struct, base64, logging, threading, asyncio, math, cv2, a
 from pathlib import Path
 from datetime import datetime
 from contextlib import asynccontextmanager
+from fractions import Fraction
 import numpy as np
 from aiortc import (
     RTCPeerConnection,
@@ -103,7 +104,7 @@ class CameraStreamTrack(MediaStreamTrack):
             vf = av.VideoFrame.from_ndarray(frame, format="bgr24")
 
         vf.pts = self._count
-        vf.time_base = av.Fraction(1, self._fps)
+        vf.time_base = Fraction(1, self._fps)
         return vf
 
 active_pcs: set[RTCPeerConnection] = set()
