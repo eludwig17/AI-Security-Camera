@@ -1,14 +1,12 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { googleLogout } from '@react-oauth/google'
-import { useMsal } from '@azure/msal-react'
 import '../App.css'
 import LiveCamera from '../components/LiveCamera.jsx'
 
 function ViewLive() {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
-  const { instance } = useMsal()
 
   useEffect(() => {
     const stored = localStorage.getItem('googleUser')
@@ -20,11 +18,7 @@ function ViewLive() {
   }, [navigate])
 
   const handleLogout = () => {
-    if (user?.provider === 'microsoft') {
-      instance.logoutRedirect({ postLogoutRedirectUri: '/' }).catch(() => {})
-    } else {
-      googleLogout()
-    }
+    googleLogout()
     localStorage.removeItem('googleUser')
     setUser(null)
     navigate('/')

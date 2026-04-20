@@ -1,23 +1,8 @@
-
 import { useEffect, useMemo, useState } from 'react'
 import { GoogleLogin, googleLogout } from '@react-oauth/google'
-import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "../authConfig";
 import { jwtDecode } from 'jwt-decode'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
-
-/* Microsoft logo (four squares) for Sign in with Microsoft button */
-function MicrosoftIcon() {
-  return (
-    <svg viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#f35325" d="M1 1h10v10H1z" />
-      <path fill="#81bc06" d="M12 1h10v10H12z" />
-      <path fill="#05a6f0" d="M1 12h10v10H1z" />
-      <path fill="#ffba08" d="M12 12h10v10H12z" />
-    </svg>
-  )
-}
 
 const sampleSlides = [
   {
@@ -96,35 +81,6 @@ function Landing() {
     return stored ? JSON.parse(stored) : null
   })
 
-  const { instance } = useMsal();
-
-  /* Handle return from Microsoft redirect: store user and go to /home */
-  useEffect(() => {
-    instance.handleRedirectPromise().then((result) => {
-      if (result && result.account) {
-        const claims = result.idTokenClaims || {};
-        const profile = {
-          name: claims.name || result.account.name || result.account.username,
-          email: claims.preferred_username || claims.email || result.account.username,
-          picture: null,
-          provider: 'microsoft',
-        };
-        setUser(profile);
-        localStorage.setItem('googleUser', JSON.stringify(profile));
-        navigate('/home', { replace: true });
-      }
-    }).catch((err) => {
-      if (err?.message && !err.message.includes('user_cancelled')) {
-        console.error('Microsoft redirect error', err);
-      }
-    });
-  }, [instance, navigate]);
-
-  const handleMicrosoftLogin = () => {
-    instance.loginRedirect(loginRequest);
-  };
-
-
   const handleGoogleSuccess = (credentialResponse) => {
     if (!credentialResponse?.credential) return
     try {
@@ -133,7 +89,6 @@ function Landing() {
         name: decoded.name,
         email: decoded.email,
         picture: decoded.picture,
-        provider: 'google',
       }
       setUser(profile)
       localStorage.setItem('googleUser', JSON.stringify(profile))
@@ -149,14 +104,10 @@ function Landing() {
   }
 
   const handleLogout = () => {
-    if (user?.provider === 'microsoft') {
-      instance.logoutRedirect({ postLogoutRedirectUri: '/' }).catch(() => {});
-    } else {
-      googleLogout();
-    }
-    setUser(null);
-    localStorage.removeItem('googleUser');
-    navigate('/');
+    googleLogout()
+    setUser(null)
+    localStorage.removeItem('googleUser')
+    navigate('/')
   }
 
   return (
@@ -185,13 +136,7 @@ function Landing() {
           <h2>Login with Google</h2>
           <div className="auth__form">
             {!user ? (
-              <>
-                <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} useOneTap />
-                <button type="button" className="auth-provider" onClick={handleMicrosoftLogin}>
-                  <MicrosoftIcon />
-                  Sign in with Microsoft
-                </button>
-              </>
+              <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} useOneTap />
             ) : (
               <div className="user-card">
                 <div className="user-card__info">

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { googleLogout } from '@react-oauth/google'
-import { useMsal } from '@azure/msal-react'
 import '../App.css'
 
 function ViewArchives() {
@@ -12,7 +11,6 @@ function ViewArchives() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [showVideo, setShowVideo] = useState(false)
   const navigate = useNavigate()
-  const { instance } = useMsal()
 
   useEffect(() => {
     const stored = localStorage.getItem('googleUser')
@@ -41,11 +39,7 @@ function ViewArchives() {
   }, [])
 
   const handleLogout = () => {
-    if (user?.provider === 'microsoft') {
-      instance.logoutRedirect({ postLogoutRedirectUri: '/' }).catch(() => {})
-    } else {
-      googleLogout()
-    }
+    googleLogout()
     localStorage.removeItem('googleUser')
     setUser(null)
     navigate('/')
