@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { googleLogout } from '@react-oauth/google'
 import { useMsal } from '@azure/msal-react'
 import '../App.css'
-// import '../components/LiveCamera.jsx'
+import LiveCamera from '../components/LiveCamera.jsx'
 
 function ViewLive() {
   const [user, setUser] = useState(null)
@@ -49,7 +49,7 @@ function ViewLive() {
             </div>
             <div className="live-video__viewport">
               <p className="microcopy">Live video will appear here from the external device.</p>
-              {/*<LiveCamera/>*/}
+              <LiveCamera/>
             </div>
           </div>
         </section>
