@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY backend/vm/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY backend/vm/VMRequirements.txt ./VMRequirements.txt
+RUN pip install --no-cache-dir -r VMRequirements.txt
 COPY backend/vm/app.py backend/vm/config.py ./
 COPY schema.sql ./
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
