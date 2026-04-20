@@ -8,4 +8,9 @@
 /dataSources.local.xml
 *.xml
 *.iml
+server.key
+server.crt
 .DS_Store
+backend/vm/__pycache__/
+.env
+open-cv-frontend.taila8654.ts.net.crt
