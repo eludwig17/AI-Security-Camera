@@ -18,10 +18,10 @@ modelPtPath = os.environ.get("MODEL_PT_PATH", "yolo26n.pt")
 confidenceThreshold = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.5"))
 
 # classes that trigger events
-eventClasses = {0: "person", 2: "car", 3: "motorcycle", 5: "bus", 7: "truck", 15: "cat", 16: "dog"}
+eventClasses = {0: "person", 3: "motorcycle", 15: "cat", 16: "dog"}
 
 # frame sending
-jpegQuality = 70
+jpegQuality = 95
 sendFps = int(os.environ.get("SEND_FPS", "30"))
 
 # recording
@@ -29,7 +29,12 @@ preRecordSeconds = 5
 postRecordSeconds = 10
 recordFps = 15
 clipDir = "clips"
-eventCooldownSeconds = 15
+eventCooldownSeconds = int(os.environ.get("EVENT_COOLDOWN_SECONDS", "30"))
+motionMinPixels = float(os.environ.get("MOTION_MIN_PIXELS", "20"))
+motionNoMotionStopSeconds = float(os.environ.get("MOTION_NO_MOTION_STOP_SECONDS", "2.5"))
+minClipSeconds = float(os.environ.get("MIN_CLIP_SECONDS", "2"))
+
+eventMinDisplacementPixels = float(os.environ.get("EVENT_MIN_DISPLACEMENT_PIXELS", "80"))
 
 # bounding box colors
 colors = {

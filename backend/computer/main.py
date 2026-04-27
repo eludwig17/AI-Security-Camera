@@ -1,8 +1,9 @@
-import argparse, logging, signal, sys, time, cv2, config
+import argparse, logging, math, signal, sys, time, cv2, config
 from camera import Camera
 from detector import Detector
 from frame_sender import FrameSender
 from recorder import RollingBuffer, ClipRecorder
+from motion import DetectionMotionFilter
 
 logging.basicConfig(
     level=getattr(logging, config.logLevel),
@@ -37,6 +38,7 @@ def main():
     sender = FrameSender()
     rollingBuffer = RollingBuffer()
     recorder = ClipRecorder()
+    motionFilter = DetectionMotionFilter(config.motionMinPixels)
 
     running = True
 
@@ -62,6 +64,7 @@ def main():
     sender.start()
 
     lastEventTime = {}
+    lastEventBbox = {}
     frameCount = 0
     fpsStart = time.time()
     fpsVal = 0.0
@@ -76,24 +79,42 @@ def main():
             continue
 
         detections = detector.detect(frame)
+        detections = motionFilter.evaluate(detections)
+        movingDetections = [d for d in detections if d.get("is_moving")]
         annotated = detector.annotate(frame, detections) if detections else frame
 
         rollingBuffer.add(frame)
         sender.send(annotated)
 
         now = time.time()
-        for det in detections:
+        for det in movingDetections:
             cls = det["class_name"]
+
+            # cooldown check
             if now - lastEventTime.get(cls, 0) < config.eventCooldownSeconds:
                 continue
+
+            # displacement check — skip if bbox center hasn't moved far enough
+            # since the last logged event for this class
+            lastBbox = lastEventBbox.get(cls)
+            if lastBbox is not None:
+                cx_new = (det["bbox"][0] + det["bbox"][2]) / 2
+                cy_new = (det["bbox"][1] + det["bbox"][3]) / 2
+                cx_old = (lastBbox[0] + lastBbox[2]) / 2
+                cy_old = (lastBbox[1] + lastBbox[3]) / 2
+                if math.hypot(cx_new - cx_old, cy_new - cy_old) < config.eventMinDisplacementPixels:
+                    logger.debug(f"skipping event for {cls}: not enough displacement since last event")
+                    continue
+
             lastEventTime[cls] = now
+            lastEventBbox[cls] = det["bbox"]
 
             if not recorder.recording:
                 recorder.startRecording(rollingBuffer.dump(), frameSize, det, frame)
 
         if recorder.recording:
             recorder.addFrame(frame)
-            if recorder.shouldStop():
+            if recorder.shouldStop(motionActive=bool(movingDetections)):
                 recorder.stopAndUpload()
 
         if args.preview:
@@ -110,7 +131,7 @@ def main():
             frameCount = 0
             fpsStart = time.time()
 
-    logger.info("snutting down")
+    logger.info("shutting down")
     sender.stop()
     camera.release()
     if args.preview:
