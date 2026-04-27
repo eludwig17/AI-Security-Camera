@@ -4,7 +4,13 @@ logger = logging.getLogger(__name__)
 
 def _gstreamerPipeline():
     return (
-        f"nvarguscamerasrc ! "
+        f"nvarguscamerasrc "
+        f"exposuretimerange='13000 683709000' "
+        f"gainrange='1 8' "
+        f"ispdigitalgainrange='1 4' "
+        f"saturation=1.4 "
+        f"wbmode=1 "
+        f"! "
         f"video/x-raw(memory:NVMM), "
         f"width=(int){config.captureWidth}, "
         f"height=(int){config.captureHeight}, "
@@ -17,7 +23,7 @@ def _gstreamerPipeline():
         f"videoconvert ! "
         f"video/x-raw, format=(string)BGR ! "
         f"appsink drop=1"
-        )
+    )
 
 class Camera:
     def __init__(self):
