@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-function LiveCamera({onStatusChange}) {
+function LiveCamera({ onStatusChange }) {
   const videoRef = useRef(null)
   const pcRef = useRef(null)
   const wsRef = useRef(null)
@@ -41,7 +41,6 @@ function LiveCamera({onStatusChange}) {
         const pc = new RTCPeerConnection({ iceServers })
         pcRef.current = pc
 
-        // receive video
         pc.addTransceiver('video', { direction: 'recvonly' })
 
         pc.ontrack = (evt) => {
@@ -62,7 +61,6 @@ function LiveCamera({onStatusChange}) {
 
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
-
 
         await new Promise((resolve) => {
           if (pc.iceGatheringState === 'complete') return resolve()
@@ -100,20 +98,147 @@ function LiveCamera({onStatusChange}) {
     return cleanup
   }, [connect, cleanup])
 
+  const statusColor = {
+    connected: '#22c55e',
+    connecting: '#f59e0b',
+    disconnected: '#ef4444',
+  }[status] ?? '#ef4444'
+
+  const statusLabel = {
+    connected: 'Live',
+    connecting: 'Connecting...',
+    disconnected: 'Disconnected',
+  }[status] ?? 'Disconnected'
+
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      playsInline
-      muted
-      style={{
-        width: '100%',
-        height: '100%',
-        objectFit: 'contain',
-        borderRadius: '8px',
-        background: '#0f172a',
-      }}
-    />
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      aspectRatio: '16 / 9',
+      background: '#080e1a',
+      borderRadius: '16px',
+      overflow: 'hidden',
+      boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 24px 48px rgba(0,0,0,0.4)',
+    }}>
+      {/* video */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
+
+      {/* scanline overlay for aesthetic */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* top-left status badge */}
+      <div style={{
+        position: 'absolute',
+        top: '14px',
+        left: '14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '7px',
+        padding: '5px 12px',
+        borderRadius: '999px',
+        background: 'rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}>
+        <span style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: statusColor,
+          boxShadow: status === 'connected' ? `0 0 0 3px ${statusColor}33` : 'none',
+          animation: status === 'connected' ? 'pulse 2s infinite' : 'none',
+          flexShrink: 0,
+        }} />
+        <span style={{
+          fontSize: '12px',
+          fontWeight: 600,
+          color: '#e2e8f0',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}>
+          {statusLabel}
+        </span>
+      </div>
+
+      {/* top-right camera label */}
+      <div style={{
+        position: 'absolute',
+        top: '14px',
+        right: '14px',
+        padding: '5px 12px',
+        borderRadius: '999px',
+        background: 'rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: 'rgba(255,255,255,0.5)',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+      }}>
+        CAM 01
+      </div>
+
+      {/* disconnected overlay */}
+      {status !== 'connected' && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          background: 'rgba(8,14,26,0.75)',
+          backdropFilter: 'blur(2px)',
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            border: `2px solid ${statusColor}44`,
+            borderTopColor: statusColor,
+            animation: 'spin 1s linear infinite',
+          }} />
+          <p style={{
+            margin: 0,
+            fontSize: '13px',
+            color: 'rgba(255,255,255,0.5)',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}>
+            {status === 'connecting' ? 'Establishing connection...' : 'Signal lost — retrying'}
+          </p>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.3); }
+          50% { box-shadow: 0 0 0 6px rgba(34,197,94,0.1); }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
   )
 }
 

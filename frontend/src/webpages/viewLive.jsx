@@ -6,6 +6,7 @@ import LiveCamera from '../components/LiveCamera.jsx'
 
 function ViewLive() {
   const [user, setUser] = useState(null)
+  const [camStatus, setCamStatus] = useState('disconnected')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -36,22 +37,46 @@ function ViewLive() {
 
       <div className="live-grid">
         <section className="panel live-panel">
-          <div className="live-video">
-            <div className="live-video__status">
-              <span className="dot-active" />
-              <p className="microcopy">{user ? 'Connected as ' + user.email : 'Waiting...'}</p>
-            </div>
-            <div className="live-video__viewport">
-              <p className="microcopy">Live video will appear here from the external device.</p>
-              <LiveCamera/>
-            </div>
-          </div>
+          <LiveCamera onStatusChange={setCamStatus} />
         </section>
 
         <aside className="panel live-actions">
           <p className="eyebrow">Session</p>
           <h3>{user?.name || 'Guest'}</h3>
           <p className="microcopy">{user?.email || 'Not signed in'}</p>
+
+          <div style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: '999px',
+              fontSize: '12px',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              background: camStatus === 'connected'
+                ? 'rgba(34,197,94,0.12)'
+                : camStatus === 'connecting'
+                ? 'rgba(245,158,11,0.12)'
+                : 'rgba(239,68,68,0.12)',
+              color: camStatus === 'connected' ? '#22c55e'
+                : camStatus === 'connecting' ? '#f59e0b'
+                : '#ef4444',
+            }}>
+              <span style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                background: 'currentColor',
+              }} />
+              {camStatus === 'connected' ? 'Stream live'
+                : camStatus === 'connecting' ? 'Connecting'
+                : 'Offline'}
+            </div>
+          </div>
+
           <div className="user-card__actions">
             <button type="button" className="google" onClick={() => navigate('/home')}>
               Go to Home
