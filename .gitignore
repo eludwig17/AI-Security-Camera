@@ -13,4 +13,6 @@ server.crt
 .DS_Store
 backend/vm/__pycache__/
 .env
-open-cv-frontend.taila8654.ts.net.crt
+open-cv-frontend.taila8654.ts.net.crt*.key
+*.crt
+*.key

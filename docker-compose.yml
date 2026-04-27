@@ -37,6 +37,7 @@ services:
       FRAME_RECEIVER_PORT: "9000"
       FRONTEND_BUILD_DIR: frontend/dist
       LOG_LEVEL: INFO
+      NTFY_TOPIC: ${NTFY_TOPIC:-}
     ports:
       - "8000:8000"
       - "9000:9000"
