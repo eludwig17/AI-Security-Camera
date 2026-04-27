@@ -18,6 +18,7 @@ services:
       NVIDIA_DRIVER_CAPABILITIES: all
       GST_PLUGIN_PATH: /usr/lib/aarch64-linux-gnu/gstreamer-1.0
       GST_DEBUG: "2"
+      PYTHONPATH: /usr/lib/python3/dist-packages:${PYTHONPATH:-}
       LD_LIBRARY_PATH: /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/nvidia:/usr/local/cuda-12.6/targets/aarch64-linux/lib:/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}
     devices:
       - /dev/video0:/dev/video0
@@ -31,6 +32,8 @@ services:
       - /usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl:ro
       - /usr/share/nvidia:/usr/share/nvidia:ro
       - /usr/local/cuda-12.6/targets/aarch64-linux/lib:/usr/local/cuda-12.6/targets/aarch64-linux/lib:ro
+      - /usr/lib/python3/dist-packages/cv2:/usr/lib/python3/dist-packages/cv2:ro
+      - /usr/lib/python3.10:/usr/lib/python3.10:ro
     deploy:
       resources:
         reservations:
