@@ -52,4 +52,3 @@ class Detector:
         ts = time.strftime("%Y-%m-%d %H:%M:%S")
         cv2.putText(out, ts, (10, out.shape[0] - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
-        return out

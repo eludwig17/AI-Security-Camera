@@ -26,6 +26,7 @@ class ClipRecorder:
         self._frameSize = None
         self._detectionInfo = None
         self._snapshotFrame = None
+        self._lastMotionTime = 0.0
         os.makedirs(config.clipDir, exist_ok=True)
 
     @property
@@ -46,6 +47,7 @@ class ClipRecorder:
         self._detectionInfo = detectionInfo
         self._snapshotFrame = snapshotFrame.copy()
         self._startTime = time.time()
+        self._lastMotionTime = self._startTime
         self._recording = True
 
         self._writer = cv2.VideoWriter(
@@ -64,8 +66,22 @@ class ClipRecorder:
         if self._recording and self._writer:
             self._writer.write(frame)
 
-    def shouldStop(self) -> bool:
-        return self._recording and (time.time() - self._startTime) >= config.postRecordSeconds
+    def shouldStop(self, motionActive: bool = True) -> bool:
+        if not self._recording:
+            return False
+
+        now = time.time()
+        if motionActive:
+            self._lastMotionTime = now
+
+        elapsed = now - self._startTime
+        if elapsed >= config.postRecordSeconds:
+            return True
+
+        if elapsed >= config.minClipSeconds and (now - self._lastMotionTime) >= config.motionNoMotionStopSeconds:
+            return True
+
+        return False
 
     def stopAndUpload(self):
         if not self._recording:
