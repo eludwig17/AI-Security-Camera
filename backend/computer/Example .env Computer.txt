@@ -1,0 +1,15 @@
+GCE_VM_IP=
+GCE_FRAME_PORT=
+GCE_API_URL=
+
+CAMERA_TYPE=csi
+
+# use .engine model after running export_model.py, .pt before
+MODEL_PT_PATH=yolo26n.pt
+MODEL_PATH=models/yolo26n.engine
+
+LOG_LEVEL=INFO
+
+EVENT_COOLDOWN_SECONDS=60
+EVENT_COOLDOWN_SECONDS=60
+MOTION_MIN_PIXELS=40
