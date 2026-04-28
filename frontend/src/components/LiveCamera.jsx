@@ -120,7 +120,6 @@ function LiveCamera({ onStatusChange }) {
       overflow: 'hidden',
       boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 24px 48px rgba(0,0,0,0.4)',
     }}>
-      {/* video */}
       <video
         ref={videoRef}
         autoPlay
@@ -135,7 +134,6 @@ function LiveCamera({ onStatusChange }) {
         }}
       />
 
-      {/* scanline overlay for aesthetic */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -143,7 +141,6 @@ function LiveCamera({ onStatusChange }) {
         pointerEvents: 'none',
       }} />
 
-      {/* top-left status badge */}
       <div style={{
         position: 'absolute',
         top: '14px',
@@ -177,7 +174,6 @@ function LiveCamera({ onStatusChange }) {
         </span>
       </div>
 
-      {/* top-right camera label */}
       <div style={{
         position: 'absolute',
         top: '14px',
@@ -196,7 +192,6 @@ function LiveCamera({ onStatusChange }) {
         CAM 01
       </div>
 
-      {/* disconnected overlay */}
       {status !== 'connected' && (
         <div style={{
           position: 'absolute',
